@@ -1,0 +1,69 @@
+# Node.js with React
+# Build a Node.js project that uses React.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- none
+
+variables:
+  IISWebsiteName: 'McKessonWeb'
+
+resources:
+ pipelines:
+     - pipeline: 'buildPipeline'
+       project: 'MProjects'
+       source: 'Build McKessonTest.web'
+       branch: 'master'
+
+stages:
+  - stage: DeployApp
+    displayName: 'Deploy App'
+    pool:
+      vmImage: windows-latest
+
+    jobs:
+    - deployment: 'DeployApp'
+      displayName: 'Deploy App'
+      environment: 'LocalServer.GLAPTOP'
+      strategy:
+        runOnce:
+            deploy:
+             steps:
+                 - checkout: none
+                 - download: 'buildPipeline'
+                   name: 'DownloadBuildArtifacts'
+                   displayName: 'Download Build Artifacts'
+                   artifact: 'dist'
+
+                 - script: echo '$(Pipeline.Workspace)\buildPipeline\dist'
+                 - task: ExtractFiles@1
+                   inputs:
+                     archiveFilePatterns: '$(Pipeline.Workspace)\buildPipeline\dist\app.zip'
+                     destinationFolder: '$(Pipeline.Workspace)\buildPipeline\dist\extracted'
+                     cleanDestinationFolder: true
+                     overwriteExistingFiles: true
+
+                 - task: IISWebAppManagementOnMachineGroup@0
+                   name: 'StopIIS'
+                   displayName: 'Stop IIS Website'
+                   inputs:
+                     IISDeploymentType: 'IISWebsite'
+                     ActionIISWebsite: 'StopWebsite'
+                     StartStopWebsiteName: '${{variables.IISWebsiteName}}'
+
+                 - task: IISWebAppDeploymentOnMachineGroup@0
+                   name: 'DeployIIS'
+                   displayName: 'Deploy IIS Website'
+                   inputs:
+                      WebSiteName: '${{variables.IISWebsiteName}}'
+                      Package: '$(Pipeline.Workspace)\buildPipeline\dist\extracted'
+                      TakeAppOfflineFlag: true
+
+                 - task: IISWebAppManagementOnMachineGroup@0
+                   name: 'StartIIS'
+                   displayName: 'Start IIS Website'
+                   inputs:
+                     IISDeploymentType: 'IISWebsite'
+                     ActionIISWebsite: 'StartWebsite'
+                     StartStopWebsiteName: '${{variables.IISWebsiteName}}'

@@ -1,0 +1,62 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- none
+
+variables:
+  IISWebsiteName: 'McKessonTestAPI'
+
+resources:
+ pipelines:
+     - pipeline: 'buildPipeline'
+       project: 'MProjects'
+       source: 'Build McKessonTest.API'
+       branch: 'master'
+
+stages:
+  - stage: DeployAPI
+    displayName: 'Deploy API'
+    pool:
+      vmImage: windows-latest
+
+    jobs:
+    - deployment: 'DeployAPI'
+      displayName: 'Deploy API'
+      environment: 'LocalServer.GLAPTOP'
+      strategy:
+        runOnce:
+            deploy:
+             steps:
+                 - checkout: none
+                 - download: 'buildPipeline'
+                   name: 'DownloadBuildArtifacts'
+                   displayName: 'Download Build Artifacts'
+                   artifact: 'McKessonTestAPI'
+
+                 - task: IISWebAppManagementOnMachineGroup@0
+                   name: 'StopIIS'
+                   displayName: 'Stop IIS Website'
+                   inputs:
+                     IISDeploymentType: 'IISWebsite'
+                     ActionIISWebsite: 'StopWebsite'
+                     StartStopWebsiteName: '${{variables.IISWebsiteName}}'
+
+                 - script: echo '$(Pipeline.Workspace)\buildPipeline\McKessonTestAPI\s'              
+                 - task: IISWebAppDeploymentOnMachineGroup@0
+                   name: 'DeployIIS'
+                   displayName: 'Deploy IIS Website'
+                   inputs:
+                     WebSiteName: '${{variables.IISWebsiteName}}'
+                     Package: '$(Pipeline.Workspace)\buildPipeline\McKessonTestAPI\s'
+                     TakeAppOfflineFlag: true
+
+                 - task: IISWebAppManagementOnMachineGroup@0
+                   name: 'StartIIS'
+                   displayName: 'Start IIS Website'
+                   inputs:
+                     IISDeploymentType: 'IISWebsite'
+                     ActionIISWebsite: 'StartWebsite'
+                     StartStopWebsiteName: '${{variables.IISWebsiteName}}'

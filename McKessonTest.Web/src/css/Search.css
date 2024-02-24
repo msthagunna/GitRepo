@@ -1,0 +1,31 @@
+.search-container {
+    max-width: 1068px;
+    width: 480px;;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  input {
+    width: 70%;
+    padding: 10px;
+    margin-right: 10px;
+  }
+  
+  button {
+    padding: 20px;
+  }
+  
+  .search-results {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .search-result {
+    border: 1px solid #ccc;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: left;
+  }
+  

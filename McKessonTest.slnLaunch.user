@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Name": "McKessonTest.API\\McKessonTest.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Name": "McKessonTes.Web\\mckessontes.web.esproj",
+        "Action": "Start",
+        "DebugTarget": "localhost (Chrome)"
+      }
+    ]
+  }
+]

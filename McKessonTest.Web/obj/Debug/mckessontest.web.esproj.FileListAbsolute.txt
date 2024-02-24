@@ -1,0 +1,2 @@
+D:\Projects\McKessonTest\McKessonTes.Web\obj\Debug\mckessontest.web.esproj.CoreCompileInputs.cache
+D:\Projects\McKessonTest\McKessonTest.Web\obj\Debug\mckessontest.web.esproj.CoreCompileInputs.cache
