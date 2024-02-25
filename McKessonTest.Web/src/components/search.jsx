@@ -2,6 +2,9 @@ import { useState } from 'react';
 import '../css/Search.css';
 import SearchResult from './SearchResult';
 import PropTypes from 'prop-types';
+import { InputGroup, FormControl, Button } from 'react-bootstrap';
+import { BiSearch, BiX } from 'react-icons/bi';
+import { IconContext } from 'react-icons';
 
 const Search = ({onSearch }) => {
   const [query, setQuery] = useState('');
@@ -40,18 +43,27 @@ const Search = ({onSearch }) => {
 
   return (
     <div className="search-container">
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onKeyDown ={handleKeyPress}
-        placeholder="Enter here your search query"
-      />
-      {query && (
-        <i className="fas fa-times-circle clear-icon" onClick={handleClearClick}></i>
-      )}
-      <button onClick={handleSearch}>Search</button>
-
+      <InputGroup>
+        <Button variant="outline-secondary" id="button-addon1" onClick={handleSearch}>          
+          <IconContext.Provider value={{ color: 'blue' }}>
+            <BiSearch />
+          </IconContext.Provider>
+        </Button>
+        <FormControl       
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown ={handleKeyPress}
+          placeholder="Enter here your search query"
+          aria-describedby="basic-addon2"
+          maxLength={50}
+        />
+            {query && (
+            <Button variant="outline-secondary" id="button-addon2" onClick={handleClearClick}>
+              <BiX />
+            </Button>
+          )}
+      </InputGroup>
+      
       <ul className="search-results">
         {results.map((result) => (
           <SearchResult key={result.id} result={result} />
